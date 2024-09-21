@@ -1,0 +1,74 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sprue Viewer</title>
+    <style>
+        canvas {
+            display: block;
+            margin: 0 auto;
+            border: 1px solid black;
+        }
+        body {
+            margin: 0;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="sprueCanvas"></canvas>
+
+    <script>
+        const canvas = document.getElementById('sprueCanvas');
+        const ctx = canvas.getContext('2d');
+
+        const img = new Image();
+        img.src = "{{ url_for('view_highlighted_image', filename=filename) }}";
+        img.onload = function() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            const scale = Math.min(canvas.width / img.width, canvas.height / img.height);
+            const xOffset = (canvas.width - img.width * scale) / 2;
+            const yOffset = (canvas.height - img.height * scale) / 2;
+
+            ctx.drawImage(img, xOffset, yOffset, img.width * scale, img.height * scale);
+
+            const numbers = {{ numbers | tojson }};
+            numbers.forEach(number => {
+                const x = xOffset + number.x * scale;
+                const y = yOffset + number.y * scale;
+                const width = number.width * scale;
+                const height = number.height * scale;
+
+                ctx.strokeStyle = 'red';
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                ctx.moveTo(0, y + height / 2);
+                ctx.lineTo(canvas.width, y + height / 2);
+                ctx.stroke();
+
+                ctx.beginPath();
+                ctx.moveTo(x + width / 2, 0);
+                ctx.lineTo(x + width / 2, canvas.height);
+                ctx.stroke();
+
+                ctx.strokeStyle = 'red';
+                ctx.lineWidth = 2;
+                ctx.strokeRect(x, y, width, height);
+
+                ctx.fillStyle = 'red';
+                ctx.font = '16px Arial';
+                ctx.fillText(number.text, x, y - 5);
+            });
+        };
+
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            img.onload();
+        });
+    </script>
+</body>
+</html>
