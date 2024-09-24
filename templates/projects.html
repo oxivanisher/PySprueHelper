@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Projects</title>
+</head>
+
+<body>
+  <h1>Projects</h1>
+  <form method="POST">
+    <label for="project_name">New Project Name:</label>
+    <input type="text" name="project_name" required>
+    <button type="submit">Create Project</button>
+  </form>
+
+  <h2>Existing Projects</h2>
+  <ul>
+    {% for project in project_list %}
+    <li><a href="{{ url_for('upload_sprue', project_name=project) }}">{{ project }}</a></li>
+    {% endfor %}
+  </ul>
+  <a href="{{ url_for('logout') }}">Logout</a>
+</body>
+
+</html>
